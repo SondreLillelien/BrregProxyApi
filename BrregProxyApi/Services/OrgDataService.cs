@@ -5,12 +5,13 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using BrregProxyApi.Model;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BrregProxyApi.Services
 {
     public interface IOrgDataService
     {
-        Task<OrgData> GetOrgDataById(string orgId);
+        Task<OrgData?> GetOrgDataById(string orgId);
     }
     
     
@@ -25,7 +26,7 @@ namespace BrregProxyApi.Services
         }
 
 
-        public async Task<OrgData> GetOrgDataById(string orgId)
+        public async Task<OrgData?> GetOrgDataById(string orgId)
         {
             var url = $"{BaseUrl}/{orgId}";
 
@@ -34,11 +35,10 @@ namespace BrregProxyApi.Services
             {
                 if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    throw new HttpRequestException($"Organization with id {orgId} not found");
+                    return null;
                 }
 
                 throw new HttpRequestException();
-
                 
             }
 

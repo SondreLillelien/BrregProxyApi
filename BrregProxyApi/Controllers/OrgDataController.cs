@@ -21,23 +21,20 @@ namespace BrregProxyApi.Controllers
         }
         
         [HttpGet]
-        [Route("org/{orgId}")]
+        [Route("{orgId}")]
         public async Task<IActionResult> GetOrgDataById(string orgId)
         {
-            if (!Int32.TryParse(orgId, out int idAsInt) || orgId.Length != 9)
+            if (!int.TryParse(orgId, out var idAsInt) || orgId.Length != 9)
             {
                 return BadRequest($"{orgId} is not a valid input. Id must be an integer with 9 digits.");
             }
-
-            try
+            
+            var data = await _service.GetOrgDataById(orgId);
+            if (data == null)
             {
-                var data = await _service.GetOrgDataById(orgId);
-                return Ok(data);
+                return NotFound($"Organization with id {orgId} not found");
             }
-            catch (HttpRequestException e)
-            {
-                return NotFound(e.Message);
-            }
+            return Ok(data);
 
             
             //Finn ut hvordan gjøre orgid til en del av ruta
@@ -45,6 +42,4 @@ namespace BrregProxyApi.Controllers
             
         }
     }
-    
-
 }
