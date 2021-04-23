@@ -25,13 +25,7 @@ namespace BrregProxyApi.Tests.IntegrationTests
             ).UseStartup<Startup>());
             _client = _server.CreateClient();
         }
-
-        [Fact]
-        public async Task SanityCheck()
-        {
-            true.Should().BeTrue();
-        }
-
+        
         [Fact]
         public async Task Get_OrgData_WithBad_OrgId_ShouldReturn_StatusCode_404()
         {

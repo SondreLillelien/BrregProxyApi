@@ -31,9 +31,6 @@ namespace BrregProxyApi.Controllers
             }
 
             return Ok(data);
-
-
-            //Finn ut hvordan gjøre orgid til en del av ruta
         }
     }
 }
