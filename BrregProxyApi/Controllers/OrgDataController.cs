@@ -1,9 +1,4 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
-using BrregProxyApi.Model;
+﻿using System.Threading.Tasks;
 using BrregProxyApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +14,7 @@ namespace BrregProxyApi.Controllers
         {
             _service = service;
         }
-        
+
         [HttpGet]
         [Route("{orgId}")]
         public async Task<IActionResult> GetOrgDataById(string orgId)
@@ -28,18 +23,17 @@ namespace BrregProxyApi.Controllers
             {
                 return BadRequest($"{orgId} is not a valid input. Id must be an integer with 9 digits.");
             }
-            
+
             var data = await _service.GetOrgDataById(orgId);
             if (data == null)
             {
                 return NotFound($"Organization with id {orgId} not found");
             }
+
             return Ok(data);
 
-            
+
             //Finn ut hvordan gjøre orgid til en del av ruta
-            
-            
         }
     }
 }

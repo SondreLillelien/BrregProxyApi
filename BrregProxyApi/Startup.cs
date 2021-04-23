@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Threading.Tasks;
+using BrregProxyApi.Options;
 using BrregProxyApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 namespace BrregProxyApi
@@ -28,16 +23,21 @@ namespace BrregProxyApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<AppSettings>(Configuration);
             services.AddControllers();
             services.AddHttpClient();
             services.AddTransient<IOrgDataService>(provider =>
             {
                 var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
-                return new OrgDataService(client);
+                var baseUrl = provider.GetRequiredService<IOptionsSnapshot<AppSettings>>()
+                    .Value
+                    .OrgDataSettings
+                    .BaseUrl;
+                return new OrgDataService(client, baseUrl);
             });
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "BrregProxyApi", Version = "v1"});
+                options.SwaggerDoc("v1", new OpenApiInfo {Title = "BrregProxyApi", Version = "v1"});
             });
         }
 
@@ -55,9 +55,7 @@ namespace BrregProxyApi
 
             app.UseRouting();
 
-            app.UseAuthorization();
-
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }

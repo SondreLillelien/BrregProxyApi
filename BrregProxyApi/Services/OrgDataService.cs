@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 using BrregProxyApi.Model;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace BrregProxyApi.Services
 {
@@ -13,22 +11,23 @@ namespace BrregProxyApi.Services
     {
         Task<OrgData?> GetOrgDataById(string orgId);
     }
-    
-    
+
+
     public class OrgDataService : IOrgDataService
     {
         private readonly HttpClient _client;
-        private const string BaseUrl = "https://data.brreg.no/enhetsregisteret/api/enheter";
+        private readonly string _baseUrl;
 
-        public OrgDataService(HttpClient client)
+        public OrgDataService(HttpClient client, string baseUrl)
         {
-            _client = client;
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _baseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
         }
 
 
         public async Task<OrgData?> GetOrgDataById(string orgId)
         {
-            var url = $"{BaseUrl}/{orgId}";
+            var url = $"{_baseUrl}/{orgId}";
 
             var response = await _client.GetAsync(url);
             if (!response.IsSuccessStatusCode)
@@ -38,21 +37,13 @@ namespace BrregProxyApi.Services
                     return null;
                 }
 
-                throw new HttpRequestException();
-                
+                throw new HttpRequestException($"Request to {url} was not successful, status code: {response.StatusCode}");
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var dto = JsonSerializer.Deserialize<OrgDataDTO>(responseContent);
-            var data = new OrgData
-            {
-                OrganizationNumber = dto.OrganizationNumber,
-                Name = dto.Name,
-                OrganizationType = dto.OrganizationForm.Code
-            };
 
-            return data;
-
+            return new OrgData(dto.OrganizationNumber, dto.Name, dto.OrganizationForm.Code);
         }
     }
 }
