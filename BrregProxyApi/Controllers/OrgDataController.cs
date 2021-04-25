@@ -17,6 +17,7 @@ namespace BrregProxyApi.Controllers
 
         [HttpGet]
         [Route("{orgId}")]
+        [ResponseCache(Duration = 30)]
         public async Task<IActionResult> GetOrgDataById(string orgId)
         {
             if (!int.TryParse(orgId, out var idAsInt) || orgId.Length != 9)

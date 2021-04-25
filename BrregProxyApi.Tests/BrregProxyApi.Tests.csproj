@@ -24,10 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="UnitTests" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\BrregProxyApi\BrregProxyApi.csproj" />
     </ItemGroup>
 
