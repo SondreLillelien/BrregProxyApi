@@ -37,7 +37,8 @@ namespace BrregProxyApi.Services
                     return null;
                 }
 
-                throw new HttpRequestException($"Request to {url} was not successful, status code: {response.StatusCode}");
+                throw new HttpRequestException(
+                    $"Request to {url} was not successful, status code: {response.StatusCode}");
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();

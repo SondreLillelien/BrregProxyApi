@@ -3,6 +3,7 @@ using BrregProxyApi.Options;
 using BrregProxyApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,7 +28,8 @@ namespace BrregProxyApi
             services.Configure<AppSettings>(Configuration);
             services.AddControllers();
             services.AddHttpClient();
-            services.AddResponseCaching();
+            services.AddSingleton<MemoryCache>();
+            //services.AddResponseCaching();
             services.AddTransient<IOrgDataService>(provider =>
             {
                 var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
@@ -53,7 +55,7 @@ namespace BrregProxyApi
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BrregProxyApi v1"));
             }
 
-            app.UseResponseCaching();
+            //app.UseResponseCaching();
 
             app.UseHttpsRedirection();
 
