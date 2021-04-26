@@ -25,8 +25,8 @@ namespace BrregProxyApi.Controllers
         public async Task<IActionResult> GetOrgDataById(string orgId)
         {
             
-
-            if (!int.TryParse(orgId, out var idAsInt) || orgId.Length != 9)
+            
+            if (!int.TryParse(orgId, out var idAsInt) || orgId.Length != 9 || orgId.Trim().Length != 9)
             {
                 return BadRequest($"{orgId} is not a valid input. Id must be an integer with 9 digits.");
             }

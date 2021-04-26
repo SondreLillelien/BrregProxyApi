@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
@@ -52,5 +55,27 @@ namespace BrregProxyApi.Tests.IntegrationTests
             var response = await _client.GetAsync($"{BaseRoute}/{invalidId}");
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
+
+        [Theory]
+        [InlineData("919300388")]
+        [InlineData("988986453")]
+        [InlineData("984851006")]
+        public async Task Get_OrgData_WithValid_OrgId_ShouldReturn_CachedResponse_IfAvailable(string validId)
+        {
+            var firstResponse = await _client.GetAsync($"{BaseRoute}/{validId}");
+            var firstResponseDate = firstResponse.Headers.Date;
+            
+            Thread.Sleep(TimeSpan.FromSeconds(1));
+            
+            var secondResponse = await _client.GetAsync($"{BaseRoute}/{validId}");
+            var secondResponseDate = secondResponse.Headers.Date;
+
+            firstResponseDate.Should().NotBeNull();
+            secondResponseDate.Should().NotBeNull();
+            firstResponse.Should().Be(secondResponse);
+        }
+
+
+        
     }
 }
