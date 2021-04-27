@@ -42,7 +42,7 @@ namespace BrregProxyApi.Services
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
-            var dto = JsonSerializer.Deserialize<OrgDataDTO>(responseContent);
+            var dto = JsonSerializer.Deserialize<OrgDataDto>(responseContent);
 
             return new OrgData(dto.OrganizationNumber, dto.Name, dto.OrganizationForm.Code);
         }

@@ -2,7 +2,7 @@
 
 namespace BrregProxyApi.Model
 {
-    public class OrgDataDTO
+    public class OrgDataDto
     {
         [JsonPropertyName(name:"organisasjonsnummer")]
         public string OrganizationNumber{ get; set; }
@@ -11,10 +11,10 @@ namespace BrregProxyApi.Model
         public string Name { get; set; }
         
         [JsonPropertyName(name:"organisasjonsform")]
-        public OrganizationTypeDTO OrganizationForm { get; set; }
+        public OrganizationTypeDto OrganizationForm { get; set; }
     }
 
-    public class OrganizationTypeDTO
+    public class OrganizationTypeDto
     {
         [JsonPropertyName(name:"kode")]
         public string Code { get; set; }

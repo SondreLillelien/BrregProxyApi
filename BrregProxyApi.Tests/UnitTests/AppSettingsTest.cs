@@ -13,13 +13,13 @@ namespace BrregProxyApi.Tests.UnitTests
 {
     public class AppSettingsTest
     {
-        public class AppSettingsDTO
+        public class AppSettingsDto
         {
             [JsonPropertyName("OrgDataSettings")]
             public OrgDataSettings OrgDataSettings { get; set; }
         }
 
-        public class OrgDataSettingsDTO
+        public class OrgDataSettingsDto
         {
             [JsonPropertyName("BaseUrl")]
             public string BaseUrl { get; set; }
@@ -34,7 +34,7 @@ namespace BrregProxyApi.Tests.UnitTests
             //JsonReader jsonReader = new JsonTextReader(textReader);
             
             
-            //var jsonBaseUrl = JsonSerializer.Deserialize<AppSettingsDTO>(jsonString);
+            //var jsonBaseUrl = JsonSerializer.Deserialize<AppSettingsDto>(jsonString);
 
         //} 
     }

@@ -3,11 +3,9 @@ using BrregProxyApi.Options;
 using BrregProxyApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
@@ -28,7 +26,7 @@ namespace BrregProxyApi
             services.Configure<AppSettings>(Configuration);
             services.AddControllers();
             services.AddHttpClient();
-            services.AddSingleton<MemoryCache>();
+            services.AddMemoryCache(options => options.SizeLimit = 128);
             //services.AddResponseCaching();
             services.AddTransient<IOrgDataService>(provider =>
             {

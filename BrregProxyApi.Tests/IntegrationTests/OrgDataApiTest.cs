@@ -5,10 +5,14 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using BrregProxyApi.Controllers;
+using BrregProxyApi.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
+using Moq;
 using Xunit;
 
 namespace BrregProxyApi.Tests.IntegrationTests
@@ -29,10 +33,12 @@ namespace BrregProxyApi.Tests.IntegrationTests
             _client = _server.CreateClient();
         }
         
-        [Fact]
-        public async Task Get_OrgData_WithBad_OrgId_ShouldReturn_StatusCode_404()
+        [Theory]
+        [InlineData("123123123")]
+        [InlineData("321321321")]
+        public async Task Get_OrgData_WithBad_OrgId_ShouldReturn_StatusCode_404(string badId)
         {
-            var response = await _client.GetAsync($"{BaseRoute}/123123123");
+            var response = await _client.GetAsync($"{BaseRoute}/{badId}");
             response.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
 
@@ -50,6 +56,12 @@ namespace BrregProxyApi.Tests.IntegrationTests
         [InlineData("tulleid")]
         [InlineData("ikke9siffer")]
         [InlineData("12312312324654323131236532412315")]
+        [InlineData("12345678 ")]
+        [InlineData(" 23456789")]
+        [InlineData(" 2345678 ")]
+        [InlineData("1234 6789")]
+        [InlineData("1234%6789")]
+        [InlineData("1234(6789")]
         public async Task Get_OrgData_WithInvalid_RequestParameter_ShouldReturn_StatusCode_400(string invalidId)
         {
             var response = await _client.GetAsync($"{BaseRoute}/{invalidId}");
@@ -57,25 +69,20 @@ namespace BrregProxyApi.Tests.IntegrationTests
         }
 
         [Theory]
-        [InlineData("919300388")]
-        [InlineData("988986453")]
-        [InlineData("984851006")]
-        public async Task Get_OrgData_WithValid_OrgId_ShouldReturn_CachedResponse_IfAvailable(string validId)
+        [InlineData("123123123")]
+        [InlineData("321312321")]
+        public async Task Get_OrgData_WithBad_OrgId_ShouldReturn_CachedResponse_IfAvailable(string badId)
         {
-            var firstResponse = await _client.GetAsync($"{BaseRoute}/{validId}");
-            var firstResponseDate = firstResponse.Headers.Date;
-            
-            Thread.Sleep(TimeSpan.FromSeconds(1));
-            
-            var secondResponse = await _client.GetAsync($"{BaseRoute}/{validId}");
-            var secondResponseDate = secondResponse.Headers.Date;
+            var firstResponse = await _client.GetAsync($"{BaseRoute}/{badId}");
 
-            firstResponseDate.Should().NotBeNull();
-            secondResponseDate.Should().NotBeNull();
-            firstResponse.Should().Be(secondResponse);
+            await Task.Delay(TimeSpan.FromSeconds(1));
+
+            var secondResponse = await _client.GetAsync($"{BaseRoute}/{badId}");
+
+            firstResponse.Should().BeEquivalentTo(secondResponse);
         }
 
 
         
     }
-}
+}   

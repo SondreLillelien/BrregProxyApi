@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using BrregProxyApi.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -11,9 +12,9 @@ namespace BrregProxyApi.Controllers
     public class OrgDataController : ControllerBase
     {
         private readonly IOrgDataService _service;
-        private readonly MemoryCache _cache;
+        private readonly IMemoryCache _cache;
 
-        public OrgDataController(IOrgDataService service, MemoryCache memoryCache)
+        public OrgDataController(IOrgDataService service, IMemoryCache memoryCache)
         {
             _service = service;
             _cache = memoryCache;
@@ -22,35 +23,21 @@ namespace BrregProxyApi.Controllers
         [HttpGet]
         [Route("{orgId}")]
         //[ResponseCache(Duration = 30)]
-        public async Task<IActionResult> GetOrgDataById(string orgId)
+        public async Task<IActionResult> GetOrgDataById( [RegularExpression(@"[0-9]{9}")]string orgId)
         {
-            
-            
-            if (!int.TryParse(orgId, out var idAsInt) || orgId.Length != 9 || orgId.Trim().Length != 9)
+            var orgData = await _cache.GetOrCreateAsync(orgId, cacheEntry =>
             {
-                return BadRequest($"{orgId} is not a valid input. Id must be an integer with 9 digits.");
-            }
+                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30);
+                cacheEntry.Size = 1;
+                return _service.GetOrgDataById(orgId);
+            });
 
-            if (!_cache.TryGetValue(orgId, out var cacheEntry))
-            {
-                var orgData = await _service.GetOrgDataById(orgId);
-                
-                _cache.Set(orgId, orgData, TimeSpan.FromSeconds(30));
-                
-                if (orgData == null)
-                {
-                    return NotFound($"Organization with id: {orgId} not found");
-                }
-                
-                return Ok(orgData);
-            }
-            
-            if (cacheEntry == null)
+            if (orgData is null)
             {
                 return NotFound($"Organization with id: {orgId} not found");
             }
 
-            return Ok(cacheEntry);
+            return Ok(orgData);
         }
     }
 }
