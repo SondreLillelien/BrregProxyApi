@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BrregProxyApi.Controllers;
-using BrregProxyApi.Model;
+using BrregProxyApi.Models;
 using BrregProxyApi.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;

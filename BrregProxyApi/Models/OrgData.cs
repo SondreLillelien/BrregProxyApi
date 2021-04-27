@@ -1,4 +1,4 @@
-﻿namespace BrregProxyApi.Model
+﻿namespace BrregProxyApi.Models
 {
     public class OrgData
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using BrregProxyApi.Model;
+using BrregProxyApi.Models;
 using BrregProxyApi.Services;
 using FluentAssertions;
 using Xunit;

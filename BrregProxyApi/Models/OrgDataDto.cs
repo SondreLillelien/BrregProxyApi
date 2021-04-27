@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace BrregProxyApi.Model
+namespace BrregProxyApi.Models
 {
     public class OrgDataDto
     {
