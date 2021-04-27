@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using BrregProxyApi.Options;
 using BrregProxyApi.Services;
@@ -20,14 +21,12 @@ namespace BrregProxyApi
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<AppSettings>(Configuration);
             services.AddControllers();
             services.AddHttpClient();
             services.AddMemoryCache(options => options.SizeLimit = 128);
-            //services.AddResponseCaching();
             services.AddTransient<IOrgDataService>(provider =>
             {
                 var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
@@ -43,7 +42,6 @@ namespace BrregProxyApi
             });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -52,8 +50,6 @@ namespace BrregProxyApi
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BrregProxyApi v1"));
             }
-
-            //app.UseResponseCaching();
 
             app.UseHttpsRedirection();
 

@@ -22,8 +22,7 @@ namespace BrregProxyApi.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        //[ResponseCache(Duration = 30)]
-        public async Task<IActionResult> Get( [RegularExpression(@"[0-9]{9}")]string id)
+        public async Task<IActionResult> Get([RegularExpression(@"[0-9]{9}")] string id)
         {
             var orgData = await _cache.GetOrCreateAsync(id, cacheEntry =>
             {
