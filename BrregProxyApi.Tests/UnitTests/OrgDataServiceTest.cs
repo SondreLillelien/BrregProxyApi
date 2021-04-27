@@ -50,13 +50,9 @@ namespace BrregProxyApi.Tests.UnitTests
         [InlineData(" e2fd2a2")]
         [InlineData("()¤#")]
         [InlineData("123123123/blabla")]
-        public async Task Get_OrgData(string id)
+        public async Task Get_OrgData_WithInvalid_Parameter_ShouldThrow_ArgumentException(string id)
         {
             await _service.Invoking(x => x.GetOrgDataById(id)).Should().ThrowAsync<ArgumentException>();
         }
-        
-        
-
-
     }
 }

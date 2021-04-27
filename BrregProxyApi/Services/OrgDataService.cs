@@ -21,6 +21,7 @@ namespace BrregProxyApi.Services
         public OrgDataService(HttpClient client)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
+            if (_client.BaseAddress is null) throw new ArgumentException("Client needs a BaseAddress");
         }
 
 
