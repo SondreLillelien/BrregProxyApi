@@ -11,11 +11,13 @@ namespace BrregProxyApi.Tests.UnitTests
     public class OrgDataServiceTest
     {
         private readonly IOrgDataService _service;
-        private const string BaseUrl = "https://data.brreg.no/enhetsregisteret/api/enheter";
+        private const string BaseUrl = "https://data.brreg.no/enhetsregisteret/api/enheter/";
 
         public OrgDataServiceTest()
         {
-            _service = new OrgDataService(new HttpClient(), BaseUrl);
+            var _client = new HttpClient();
+            _client.BaseAddress = new Uri(BaseUrl);
+            _service = new OrgDataService(_client);
         }
 
         [Theory]

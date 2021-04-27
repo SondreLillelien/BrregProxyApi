@@ -23,23 +23,36 @@ namespace BrregProxyApi
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // config
             services.Configure<AppSettings>(Configuration);
+            services.AddTransient(provider => provider.GetRequiredService<IOptions<AppSettings>>().Value);
+            
+            // mvc
             services.AddControllers();
-            services.AddHttpClient();
-            services.AddMemoryCache(options => options.SizeLimit = 128);
-            services.AddTransient<IOrgDataService>(provider =>
-            {
-                var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
-                var baseUrl = provider.GetRequiredService<IOptionsSnapshot<AppSettings>>()
-                    .Value
-                    .OrgDataSettings
-                    .BaseUrl;
-                return new OrgDataService(client, baseUrl);
-            });
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new OpenApiInfo {Title = "BrregProxyApi", Version = "v1"});
             });
+            
+            // services
+            services.AddHttpClient<IOrgDataService, OrgDataService>((provider, client) =>
+            {
+                var baseUrl = provider.GetRequiredService<AppSettings>()
+                    .OrgDataSettings
+                    .BaseUrl;
+                client.BaseAddress = new Uri(baseUrl);
+            });
+            services.AddMemoryCache(options => options.SizeLimit = 128);
+            
+            // services.AddTransient<IOrgDataService>(provider =>
+            // {
+            //     var client = provider.GetRequiredService<IHttpClientFactory>().CreateClient();
+            //     var baseUrl = provider.GetRequiredService<AppSettings>()
+            //         .OrgDataSettings
+            //         .BaseUrl;
+            //     return new OrgDataService(client, baseUrl);
+            // });
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -17,12 +17,10 @@ namespace BrregProxyApi.Services
     public class OrgDataService : IOrgDataService
     {
         private readonly HttpClient _client;
-        private readonly string _baseUrl;
 
-        public OrgDataService(HttpClient client, string baseUrl)
+        public OrgDataService(HttpClient client)
         {
             _client = client ?? throw new ArgumentNullException(nameof(client));
-            _baseUrl = baseUrl ?? throw new ArgumentNullException(nameof(baseUrl));
         }
 
 
@@ -35,9 +33,8 @@ namespace BrregProxyApi.Services
                 throw new ArgumentException($"Argument: {orgId} did not match regex: {regexString}");
             }
             
-            var url = $"{_baseUrl}/{orgId}";
 
-            var response = await _client.GetAsync(url);
+            var response = await _client.GetAsync(orgId);
             if (!response.IsSuccessStatusCode)
             {
                 if (response.StatusCode == HttpStatusCode.NotFound)
@@ -46,7 +43,7 @@ namespace BrregProxyApi.Services
                 }
 
                 throw new HttpRequestException(
-                    $"Request to {url} was not successful, status code: {response.StatusCode}");
+                    $"Request to {response.RequestMessage?.RequestUri} was not successful, status code: {response.StatusCode}");
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
