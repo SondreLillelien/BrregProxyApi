@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BrregProxyApi.Model;
 
@@ -27,6 +28,13 @@ namespace BrregProxyApi.Services
 
         public async Task<OrgData?> GetOrgDataById(string orgId)
         {
+            const string regexString = @"[0-9]{9}$";
+            Regex regex = new Regex(regexString);
+            if (!regex.IsMatch(orgId))
+            {
+                throw new ArgumentException($"Argument: {orgId} did not match regex: {regexString}");
+            }
+            
             var url = $"{_baseUrl}/{orgId}";
 
             var response = await _client.GetAsync(url);

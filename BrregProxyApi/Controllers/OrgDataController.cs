@@ -21,20 +21,20 @@ namespace BrregProxyApi.Controllers
         }
 
         [HttpGet]
-        [Route("{orgId}")]
+        [Route("{id}")]
         //[ResponseCache(Duration = 30)]
-        public async Task<IActionResult> GetOrgDataById( [RegularExpression(@"[0-9]{9}")]string orgId)
+        public async Task<IActionResult> Get( [RegularExpression(@"[0-9]{9}")]string id)
         {
-            var orgData = await _cache.GetOrCreateAsync(orgId, cacheEntry =>
+            var orgData = await _cache.GetOrCreateAsync(id, cacheEntry =>
             {
                 cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(30);
                 cacheEntry.Size = 1;
-                return _service.GetOrgDataById(orgId);
+                return _service.GetOrgDataById(id);
             });
 
             if (orgData is null)
             {
-                return NotFound($"Organization with id: {orgId} not found");
+                return NotFound($"Organization with id: {id} not found");
             }
 
             return Ok(orgData);

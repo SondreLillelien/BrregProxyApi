@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using BrregProxyApi.Controllers;
+using BrregProxyApi.Model;
 using BrregProxyApi.Services;
 using FluentAssertions;
 using Microsoft.Extensions.Caching.Memory;
@@ -19,49 +20,51 @@ namespace BrregProxyApi.Tests.UnitTests
         [InlineData("984851006")]
         [InlineData("123123123")]
         [InlineData("321321321")]
-        public async Task Get_OrgData_ShouldReturn_CachedResponse_IfAvailable(string validId)
+        public async Task Get_Within_CacheEntryExpirationDate_ShouldOnlyCallService_Once(string validId)
         {
             var cache = new MemoryCache(new MemoryCacheOptions());
-            var service = new Mock<IOrgDataService>();
             
-            cache.Count.Should().Be(0);
-            var firstOrgData = await cache.GetOrCreateAsync(validId, cacheEntry =>
-            {
-                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(1);
-                return service.Object.GetOrgDataById(validId);
-            });
-        
+            var testdata = new OrgData(validId, "testname", "test");
+            
+            var mockedService = new Mock<IOrgDataService>();
+            mockedService
+                .Setup(x => x.GetOrgDataById(validId))
+                .Returns(Task.FromResult(testdata));
+            
+            var controller = new OrgDataController(mockedService.Object, cache);
+
+            var result1 = await controller.Get(validId);
+            var result2 = await controller.Get(validId);
+
             cache.Count.Should().Be(1);
-        
-            var secondOrgData = await cache.GetOrCreateAsync(validId, cacheEntry =>
-            {
-                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(1);
-                return service.Object.GetOrgDataById(validId);
-            });
-        
-            cache.Count.Should().Be(1);
-            firstOrgData.Should().BeSameAs(secondOrgData);
+            mockedService.Verify(x => x.GetOrgDataById(validId),Times.Once);
+  
         }
 
-        [Theory]
-        [InlineData("919300388")]
-        [InlineData("123123123")]
-        public async Task Get_OrgData_CacheEntry_ShouldExpire_AfterExpirationDate(string orgId)
+
+        [Fact]
+        public async Task Get_WithInterval_Over_CacheEntryExpirationDate_ShouldCallServiceTwice()
         {
             var cache = new MemoryCache(new MemoryCacheOptions());
-            var service = new Mock<IOrgDataService>();
+            var validId = "123123123";
             
-            await cache.GetOrCreateAsync(orgId, cacheEntry =>
-            {
-                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(1);
-                return service.Object.GetOrgDataById(orgId);
-            });
+            var testdata = new OrgData(validId, "testname", "test");
+            
+            var mockedService = new Mock<IOrgDataService>();
+            mockedService
+                .Setup(x => x.GetOrgDataById(validId))
+                .Returns(Task.FromResult(testdata));
+            
+            var controller = new OrgDataController(mockedService.Object, cache);
 
-            cache.TryGetValue(orgId, out var cacheEntry1).Should().BeTrue();
+            var result1 = await controller.Get(validId);
 
-            await Task.Delay(TimeSpan.FromMilliseconds(1200));
+            await Task.Delay(TimeSpan.FromSeconds(31));
+            var result2 = await controller.Get(validId);
 
-            cache.TryGetValue(orgId, out var cacheEntry2).Should().BeFalse();
+            cache.Count.Should().Be(1);
+            mockedService.Verify(x => x.GetOrgDataById(validId),Times.Exactly(2));
+  
         }
     }
 }

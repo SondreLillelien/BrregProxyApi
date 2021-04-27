@@ -2,17 +2,11 @@
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Threading;
 using System.Threading.Tasks;
-using BrregProxyApi.Controllers;
-using BrregProxyApi.Services;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
-using Moq;
 using Xunit;
 
 namespace BrregProxyApi.Tests.IntegrationTests
