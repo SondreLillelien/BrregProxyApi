@@ -61,22 +61,5 @@ namespace BrregProxyApi.Tests.IntegrationTests
             var response = await _client.GetAsync($"{BaseRoute}/{invalidId}");
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
-
-        [Theory]
-        [InlineData("123123123")]
-        [InlineData("321312321")]
-        public async Task Get_OrgData_WithBad_OrgId_ShouldReturn_CachedResponse_IfAvailable(string badId)
-        {
-            var firstResponse = await _client.GetAsync($"{BaseRoute}/{badId}");
-
-            await Task.Delay(TimeSpan.FromSeconds(1));
-
-            var secondResponse = await _client.GetAsync($"{BaseRoute}/{badId}");
-
-            firstResponse.Should().BeEquivalentTo(secondResponse);
-        }
-
-
-        
     }
 }   
