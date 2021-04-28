@@ -1,5 +1,4 @@
 using System;
-using System.Net.Http;
 using BrregProxyApi.Options;
 using BrregProxyApi.Services;
 using Microsoft.AspNetCore.Builder;
